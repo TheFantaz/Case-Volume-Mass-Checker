@@ -1,0 +1,18 @@
+{
+    "manifest_version": 3,
+    "name": "Amazon Product Info Extractor",
+    "version": "1.0",
+    "description": "Extracts product weight and volume from Amazon product pages.",
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["*://www.amazon.com/*"],
+    "action": {
+      "default_popup": "popup.html"
+    },
+    "content_scripts": [
+      {
+        "matches": ["*://www.amazon.com/*"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
