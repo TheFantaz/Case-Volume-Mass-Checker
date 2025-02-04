@@ -10,7 +10,7 @@
     },
     "content_scripts": [
       {
-        "matches": ["*://www.amazon.com/*"],
+        "matches": ["*://www.amazon.com/*","*://www.newegg.com/*"],
         "js": ["content.js"]
       }
     ]

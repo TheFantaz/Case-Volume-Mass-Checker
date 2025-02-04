@@ -1,9 +1,6 @@
-document.getElementById("extract").addEventListener("click", () => {
+document.addEventListener("DOMContentLoaded", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs || tabs.length === 0) {
-            document.getElementById("result").innerText = "Error: No active tab found.";
-            return;
-        }
+        if (!tabs.length) return;
 
         chrome.tabs.sendMessage(tabs[0].id, { action: "extract" }, (response) => {
             let resultDiv = document.getElementById("result");
@@ -21,31 +18,3 @@ document.getElementById("extract").addEventListener("click", () => {
         });
     });
 });
-
-
-function extractProductInfoFromPage() {
-    let weightElement = [...document.querySelectorAll("th")].find(el => el.innerText.includes("Item Weight"));
-    let dimensionsElement = [...document.querySelectorAll("th")].find(el => el.innerText.includes("Product Dimensions"));
-
-    if (!weightElement || !dimensionsElement) {
-        return { error: "Could not find product details." };
-    }
-
-    let weightText = weightElement.nextElementSibling?.innerText;
-    let dimensionsText = dimensionsElement.nextElementSibling?.innerText;
-
-    let weight = parseFloat(weightText.replace(/[^\d.]/g, ""));
-    let dims = dimensionsText.match(/[\d.]+/g).map(Number);
-
-    if (dims.length !== 3) {
-        return { error: "Could not parse dimensions." };
-    }
-
-    let volumeCubicInches = dims[0] * dims[1] * dims[2];
-    let volumeLiters = volumeCubicInches * 0.0163871;
-
-    return {
-        weight: weight + " lbs",
-        volume: volumeLiters.toFixed(2) + " L"
-    };
-}
