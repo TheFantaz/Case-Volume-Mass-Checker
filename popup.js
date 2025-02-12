@@ -1,20 +1,27 @@
-document.addEventListener("DOMContentLoaded", () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs.length) return;
+document.addEventListener('DOMContentLoaded', () => {
+    const checkboxes = ['showWeight', 'showDimensions', 'showVolume'];
+    
+    // Load saved preferences
+    checkboxes.forEach(id => {
+        chrome.storage.sync.get(id, (data) => {
+            document.getElementById(id).checked = data[id] !== false;
+        });
+    });
 
-        chrome.tabs.sendMessage(tabs[0].id, { action: "extract" }, (response) => {
-            let resultDiv = document.getElementById("result");
-
-            if (chrome.runtime.lastError) {
-                resultDiv.innerText = "Error: Could not communicate with content script.";
-                return;
-            }
-
-            if (response && !response.error) {
-                resultDiv.innerHTML = `<strong>Weight:</strong> ${response.weight} <br> <strong>Volume:</strong> ${response.volume}`;
-            } else {
-                resultDiv.innerText = "Error: " + (response?.error || "Unknown error");
-            }
+    // Save preferences on change
+    checkboxes.forEach(id => {
+        document.getElementById(id).addEventListener('change', (e) => {
+            chrome.storage.sync.set({ [id]: e.target.checked });
+            chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                chrome.tabs.sendMessage(tabs[0].id, {
+                    action: "updateDisplay",
+                    preferences: {
+                        showWeight: document.getElementById('showWeight').checked,
+                        showDimensions: document.getElementById('showDimensions').checked,
+                        showVolume: document.getElementById('showVolume').checked
+                    }
+                });
+            });
         });
     });
 });

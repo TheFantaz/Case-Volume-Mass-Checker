@@ -1,15 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazon Extractor</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            width: 200px;
+            padding: 10px;
+        }
+        .checkbox-container {
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-    <h2>Amazon Product Info</h2>
-    <button id="extract">Extract Info</button>
-    <div id="result"></div>
+    <h1>CheckBox</h1>
+    <div class="checkbox-container">
+        <input type="checkbox" id="showWeight" checked>
+        <label for="showWeight">Show Weight</label>
+    </div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="showDimensions" checked>
+        <label for="showDimensions">Show Dimensions</label>
+    </div>
+    <div class="checkbox-container">
+        <input type="checkbox" id="showVolume" checked>
+        <label for="showVolume">Show Volume</label>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>

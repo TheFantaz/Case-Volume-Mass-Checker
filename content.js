@@ -10,7 +10,11 @@ function extractAmazonInfo() {
     if (dims.length !== 3) return null;
     
     let volumeLiters = (dims[0] * dims[1] * dims[2]) * 0.0163871;
-    return { weight: weight + " lbs", volume: volumeLiters.toFixed(2) + " L" };
+    return { 
+        weight: weight + " lbs", 
+        volume: volumeLiters.toFixed(2) + " L",
+        dimensions: `${dims[0]} x ${dims[1]} x ${dims[2]} inches`
+    };
 }
 
 function extractNeweggInfo() {
@@ -25,7 +29,11 @@ function extractNeweggInfo() {
     if (dims.length !== 3) return null;
     
     let volumeLiters = (dims[0] * dims[1] * dims[2]) * 0.0163871;
-    return { weight: weight + " lbs", volume: volumeLiters.toFixed(2) + " L" };
+    return { 
+        weight: weight + " lbs", 
+        volume: volumeLiters.toFixed(2) + " L",
+        dimensions: `${dims[0]} x ${dims[1]} x ${dims[2]} inches`
+    };
 }
 
 function insertProductInfo() {
@@ -54,18 +62,73 @@ function insertProductInfo() {
     infoDiv.style.border = "2px solid #ff9900";
     infoDiv.style.backgroundColor = "#fff7e6";
     infoDiv.style.fontSize = "16px";
-    infoDiv.innerHTML = `<strong>Weight:</strong> ${data.weight} <br> <strong>Volume:</strong> ${data.volume}`;
+
+    let displayElements = [];
+    if (displayPreferences.showWeight) displayElements.push(`<strong>Weight:</strong> ${data.weight}`);
+    if (displayPreferences.showVolume) displayElements.push(`<strong>Volume:</strong> ${data.volume}`);
+    if (displayPreferences.showDimensions) displayElements.push(`<strong>Dimensions:</strong> ${data.dimensions}`);
+
+    infoDiv.innerHTML = displayElements.join('<br>');
     
     productTitle.parentNode.insertBefore(infoDiv, productTitle.nextSibling);
 }
 
-// Run on page load
-window.onload = insertProductInfo;
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "updateDisplay") {
+        displayPreferences = request.preferences;
+        let existingInfo = document.getElementById("product-info");
+        if (existingInfo) {
+            let data = window.location.href.includes("amazon.com") ? 
+                extractAmazonInfo() : extractNeweggInfo();
+                
+            let displayElements = [];
+            if (displayPreferences.showWeight) displayElements.push(`<strong>Weight:</strong> ${data.weight}`);
+            if (displayPreferences.showVolume) displayElements.push(`<strong>Volume:</strong> ${data.volume}`);
+            if (displayPreferences.showDimensions) displayElements.push(`<strong>Dimensions:</strong> ${data.dimensions}`);
+
+            existingInfo.innerHTML = displayElements.join('<br>');
+        }
+    }
     if (request.action === "extract") {
         let url = window.location.href;
         let data = url.includes("amazon.com") ? extractAmazonInfo() : url.includes("newegg.com") ? extractNeweggInfo() : null;
         sendResponse(data || { error: "Could not extract product info." });
     }
+});  // At the start of content.js, modify how displayPreferences is initialized
+  let displayPreferences = {
+      showWeight: true,
+      showDimensions: true,
+      showVolume: true
+  };
+
+  // Add this function to load preferences before showing the info
+  function loadPreferencesAndDisplay() {
+      chrome.storage.sync.get(['showWeight', 'showDimensions', 'showVolume'], (result) => {
+          displayPreferences = {
+              showWeight: result.showWeight !== false,
+              showDimensions: result.showDimensions !== false,
+              showVolume: result.showVolume !== false
+          };
+          insertProductInfo();
+      });
+  }
+
+  // Replace window.onload with this
+  window.onload = loadPreferencesAndDisplay;
+infoDiv.innerHTML = [
+    displayPreferences.showWeight ? `<strong>Weight:</strong> ${data.weight}` : '',
+    displayPreferences.showVolume ? `<strong>Volume:</strong> ${data.volume}` : '',
+    displayPreferences.showDimensions ? `<strong>Dimensions:</strong> ${data.dimensions}` : ''
+].filter(Boolean).join('<br>');
+
+// Add this to your message listener
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "updateDisplay") {
+        displayPreferences = request.preferences;
+        // Refresh the display
+        let existingInfo = document.getElementById("product-info");
+        if (existingInfo) existingInfo.remove();
+        insertProductInfo();
+    }
+    // ... existing message handling code
 });

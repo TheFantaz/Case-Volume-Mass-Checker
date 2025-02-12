@@ -3,7 +3,7 @@
     "name": "PC Case Product Info Extractor",
     "version": "1.0",
     "description": "Extracts product weight and volume from Amazon/Newegg product pages.",
-    "permissions": ["activeTab", "scripting"],
+    "permissions": ["activeTab", "scripting","storage"],
     "host_permissions": ["*://www.amazon.com/*","*://www.newegg.com/*"],
     "action": {
       "default_popup": "popup.html"
