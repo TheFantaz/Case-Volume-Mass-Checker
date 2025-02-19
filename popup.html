@@ -2,29 +2,135 @@
 <html>
 <head>
     <style>
+        /* Make the overall popup smaller, with minimal gray padding */
         body {
-            width: 200px;
-            padding: 10px;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            /* Control the total width of the popup */
+            width: 260px; 
+            box-sizing: border-box;
         }
-        .checkbox-container {
-            margin: 10px 0;
+
+        /* Make the inner box (settings-container) wider */
+        .settings-container {
+            width: 240px;               
+            margin: 10px auto;         
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-top: 0;
+            text-align: center;
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        /* Use a grid so labels and toggles align in neat columns */
+        .toggle-row {
+            display: grid;
+            grid-template-columns: 1fr auto; /* Label on left, toggle on right */
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .toggle-row label {
+            font-size: 1rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        /* Switch styles */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #fff;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Small note at the bottom */
+        .note {
+            font-size: 0.9rem;
+            color: #777;
+            text-align: center;
+            margin-top: 15px;
         }
     </style>
 </head>
 <body>
-    <h1>CheckBox</h1>
-    <div class="checkbox-container">
-        <input type="checkbox" id="showWeight" checked>
-        <label for="showWeight">Show Weight</label>
+    <div class="settings-container">
+        <h1>Display Settings</h1>
+        
+        <div class="toggle-row">
+            <label for="showWeight">Enable Weight</label>
+            <label class="switch">
+                <input type="checkbox" id="showWeight" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="toggle-row">
+            <label for="showDimensions">Enable Dimensions</label>
+            <label class="switch">
+                <input type="checkbox" id="showDimensions" checked>
+                <span class="slider"></span>
+            </label>
+        </div>
+        
+        <div class="toggle-row">
+            <label for="showVolume">Enable Volume</label>
+            <label class="switch">
+                <input type="checkbox" id="showVolume">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="note">Use the toggles to control what product data is displayed.</div>
     </div>
-    <div class="checkbox-container">
-        <input type="checkbox" id="showDimensions" checked>
-        <label for="showDimensions">Show Dimensions</label>
-    </div>
-    <div class="checkbox-container">
-        <input type="checkbox" id="showVolume" checked>
-        <label for="showVolume">Show Volume</label>
-    </div>
+
+    <!-- Keep your existing functionality in popup.js -->
     <script src="popup.js"></script>
 </body>
 </html>
